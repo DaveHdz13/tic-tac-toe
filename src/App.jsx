@@ -1,34 +1,67 @@
 import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
 import './App.css'
 
+const TURNS = {
+  x: 'x',
+  o: 'o'
+}
+
+// Setting each square for the turns
+const Square = ({ children, isSelected, updateBoard, i }) => {
+  const className = `square ${isSelected ? 'is-selected': ''}`
+  const handleClick = () => {
+    updateBoard(i)
+  }
+
+  return(
+    <div onClick={handleClick} className={className}>
+      {children}
+    </div>
+  )
+}
+
 function App() {
-  const [count, setCount] = useState(0)
+  // Board of 9 empty squares
+  const [board, setBoard] = useState(Array(9).fill(null))
+  // Set the next turn each time the board updates
+  const [turn, setTurn] = useState(TURNS.x)
+
+  const updateBoard = (i) => {
+    // Don't update this position
+    if(board[i]) return
+
+    // Updates the board
+    const newBoard = [...board]
+    newBoard[i] = turn
+    setBoard(newBoard)
+
+    // Switches the turn
+    let newTurn = turn === TURNS.x ? TURNS.o : TURNS.x
+    setTurn(newTurn)
+  }
 
   return (
-    <div className="App">
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://reactjs.org" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </div>
+    <main className='board'>
+      <h1>Tic Tac Toe</h1>
+      <section className='game'>
+        {
+          board.map((_, i) => {
+            return(
+              <Square
+                key={i}
+                index={i} 
+                updateBoard={updateBoard}>
+                  {board[i]}
+              </Square>
+            )
+          })
+        }
+      </section>
+      <section className='turn'>
+        <Square isSelected={turn === TURNS.x}>{TURNS.x}</Square>
+        <Square isSelected={turn === TURNS.o}>{TURNS.o}</Square>
+      </section>
+    </main>
   )
 }
 
